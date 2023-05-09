@@ -10,11 +10,16 @@ lazy val root = (project in file("."))
   .settings(
     name := "PersonalFinances",
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
-    libraryDependencies ++= Seq(`zio-test`, `zio-test-sbt`, `zio-http`, `zio-http-test`)
+    libraryDependencies ++= Seq(
+      `zio-test`, `zio-test-sbt`, `zio-http`, `zio-http-test`,
+      `quill`, `postgres`, `liquibase`,
+      `zio-config`, `zio-config-magnolia`, `zio-config-typesafe`,
+      `logback`
+    )
   )
   .settings(
     Docker / version          := version.value,
-    Compile / run / mainClass := Option("com.alexrezv.personalfinances.Personalfinances")
+    Compile / run / mainClass := Option("com.alexrezv.personalfinances.PersonalFinances")
   )
 
 addCommandAlias("fmt", "scalafmt; Test / scalafmt; sFix;")
