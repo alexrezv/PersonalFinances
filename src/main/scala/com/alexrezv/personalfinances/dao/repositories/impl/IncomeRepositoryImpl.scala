@@ -2,22 +2,22 @@ package com.alexrezv.personalfinances.dao.repositories.impl
 
 import com.alexrezv.personalfinances.dao.entities.{IncomeCategory, IncomeRecord}
 import com.alexrezv.personalfinances.dao.repositories.IncomeRepository
-import io.getquill.SnakeCase
-import io.getquill.jdbczio.Quill
-import zio.{ZIO, ZLayer}
+import com.alexrezv.personalfinances.db
+import io.getquill.context.ZioJdbc.QIO
+import zio.{ULayer, ZLayer}
 
-import java.sql.{SQLException, Types}
+import java.sql.Types
 import java.util.UUID
 
 object IncomeRepositoryImpl {
-  val layer: ZLayer[Quill.Postgres[SnakeCase], Nothing, IncomeRepositoryImpl] =
-    ZLayer.fromFunction(IncomeRepositoryImpl.apply _)
+  val layer: ULayer[IncomeRepositoryImpl] =
+    ZLayer.succeed(new IncomeRepositoryImpl())
 }
 
-final case class IncomeRepositoryImpl(quill: Quill.Postgres[SnakeCase]) extends IncomeRepository {
-  import quill._
+final case class IncomeRepositoryImpl() extends IncomeRepository {
+  import db.Ctx._
 
-  implicit val incomeInsertMeta: quill.InsertMeta[IncomeRecord] = insertMeta[IncomeRecord](_.id)
+  implicit val incomeInsertMeta: InsertMeta[IncomeRecord] = insertMeta[IncomeRecord](_.id)
 
   private val qs = quote {
     querySchema[IncomeRecord](
@@ -41,7 +41,7 @@ final case class IncomeRepositoryImpl(quill: Quill.Postgres[SnakeCase]) extends 
     (index, category, row) => row.setObject(index, category.name)
   )
 
-  override def getIncomeRecordsByUserId(uuid: String): ZIO[Any, SQLException, List[IncomeRecord]] =
+  override def getIncomeRecordsByUserId(uuid: String): QIO[List[IncomeRecord]] =
     run(
       qs.filter(_.usrId == lift(UUID.fromString(uuid)))
     )
