@@ -1,17 +1,19 @@
 package com.alexrezv.personalfinances.dao.repositories
 
 import com.alexrezv.personalfinances.dao.entities.SpendingRecord
-import zio.ZIO
+import io.getquill.context.ZioJdbc.QIO
+import zio.{&, ZIO}
 
 import java.sql.SQLException
+import javax.sql.DataSource
 
 trait SpendingRepository {
-  def getSpendingRecordsByUserId(uuid: String): ZIO[Any, SQLException, List[SpendingRecord]]
+  def getSpendingRecordsByUserId(uuid: String): QIO[List[SpendingRecord]]
 }
 
 object SpendingRepository {
   def getSpendingRecordsByUserId(
       uuid: String
-    ): ZIO[SpendingRepository, SQLException, List[SpendingRecord]] =
+    ): ZIO[DataSource & SpendingRepository, SQLException, List[SpendingRecord]] =
     ZIO.serviceWithZIO[SpendingRepository](_.getSpendingRecordsByUserId(uuid))
 }

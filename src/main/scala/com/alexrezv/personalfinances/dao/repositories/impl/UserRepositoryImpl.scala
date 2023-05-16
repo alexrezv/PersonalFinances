@@ -2,22 +2,21 @@ package com.alexrezv.personalfinances.dao.repositories.impl
 
 import com.alexrezv.personalfinances.dao.entities.User
 import com.alexrezv.personalfinances.dao.repositories.UserRepository
-import io.getquill.SnakeCase
-import io.getquill.jdbczio.Quill
-import zio.{ZIO, ZLayer}
+import com.alexrezv.personalfinances.db
+import io.getquill.context.ZioJdbc.QIO
+import zio.{ULayer, ZLayer}
 
-import java.sql.SQLException
 import java.util.UUID
 
 object UserRepositoryImpl {
-  val layer: ZLayer[Quill.Postgres[SnakeCase], Nothing, UserRepositoryImpl] =
-    ZLayer.fromFunction(UserRepositoryImpl.apply _)
+  val layer: ULayer[UserRepositoryImpl] =
+    ZLayer.succeed(new UserRepositoryImpl())
 }
 
-final case class UserRepositoryImpl(quill: Quill.Postgres[SnakeCase]) extends UserRepository {
-  import quill._
+final case class UserRepositoryImpl() extends UserRepository {
+  import db.Ctx._
 
-  implicit val userInsertMeta: quill.InsertMeta[User] = insertMeta[User](_.id)
+  implicit val userInsertMeta: InsertMeta[User] = insertMeta[User](_.id)
 
   private val qs = quote {
     querySchema[User](
@@ -28,10 +27,10 @@ final case class UserRepositoryImpl(quill: Quill.Postgres[SnakeCase]) extends Us
     )
   }
 
-  override def getUsers: ZIO[Any, SQLException, List[User]] =
+  override def getUsers: QIO[List[User]] =
     run(qs)
 
-  override def getUserByUUID(uuid: String): ZIO[Any, SQLException, Option[User]] =
+  override def getUserByUUID(uuid: String): QIO[Option[User]] =
     run(
       qs.filter(_.uuid == lift(UUID.fromString(uuid)))
     ).map(_.headOption)

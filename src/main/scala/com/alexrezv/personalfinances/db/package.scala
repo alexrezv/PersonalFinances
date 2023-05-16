@@ -7,8 +7,7 @@ import zio._
 import javax.sql.DataSource
 
 package object db {
-  var quillLayer: ZLayer[DataSource, Nothing, Quill.Postgres[SnakeCase.type]] =
-    Quill.Postgres.fromNamingStrategy(SnakeCase)
+  object Ctx extends PostgresZioJdbcContext(NamingStrategy(SnakeCase))
 
   val dsLayer: ZLayer[Any, Throwable, DataSource] =
     Quill.DataSource.fromPrefix("db")

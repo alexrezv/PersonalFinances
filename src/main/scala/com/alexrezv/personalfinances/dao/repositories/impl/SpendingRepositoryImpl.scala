@@ -2,23 +2,22 @@ package com.alexrezv.personalfinances.dao.repositories.impl
 
 import com.alexrezv.personalfinances.dao.entities.{SpendingCategory, SpendingRecord}
 import com.alexrezv.personalfinances.dao.repositories.SpendingRepository
-import io.getquill.SnakeCase
-import io.getquill.jdbczio.Quill
-import zio.{ZIO, ZLayer}
+import com.alexrezv.personalfinances.db
+import io.getquill.context.ZioJdbc.QIO
+import zio.{ULayer, ZLayer}
 
-import java.sql.{SQLException, Types}
+import java.sql.Types
 import java.util.UUID
 
 object SpendingRepositoryImpl {
-  val layer: ZLayer[Quill.Postgres[SnakeCase], Nothing, SpendingRepositoryImpl] =
-    ZLayer.fromFunction(SpendingRepositoryImpl.apply _)
+  val layer: ULayer[SpendingRepositoryImpl] =
+    ZLayer.succeed(new SpendingRepositoryImpl())
 }
 
-final case class SpendingRepositoryImpl(quill: Quill.Postgres[SnakeCase])
-    extends SpendingRepository {
-  import quill._
+final case class SpendingRepositoryImpl() extends SpendingRepository {
+  import db.Ctx._
 
-  implicit val incomeInsertMeta: quill.InsertMeta[SpendingRecord] = insertMeta[SpendingRecord](_.id)
+  implicit val incomeInsertMeta: InsertMeta[SpendingRecord] = insertMeta[SpendingRecord](_.id)
 
   private val qs = quote {
     querySchema[SpendingRecord](
@@ -44,7 +43,7 @@ final case class SpendingRepositoryImpl(quill: Quill.Postgres[SnakeCase])
 
   override def getSpendingRecordsByUserId(
       uuid: String
-    ): ZIO[Any, SQLException, List[SpendingRecord]] =
+    ): QIO[List[SpendingRecord]] =
     run(
       qs.filter(_.usrId == lift(UUID.fromString(uuid)))
     )
