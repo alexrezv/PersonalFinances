@@ -12,10 +12,8 @@ lazy val root = (project in file("."))
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     libraryDependencies ++= Seq(
       `zio-test`, `zio-test-sbt`, `zio-http`, `zio-http-test`,
-      `quill`, `postgres`, `liquibase`,
-      `zio-config`, `zio-config-magnolia`, `zio-config-typesafe`,
-      `logback`
-    )
+      quill, postgres, liquibase, logback
+    ) ++ `zio-config` ++ circe
   )
   .settings(
     Docker / version          := version.value,
