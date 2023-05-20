@@ -5,5 +5,6 @@ import java.util.UUID
 case class User(
     id: Long,
     uuid: UUID,
-    userName: String
+    userName: String,
+    password: String
   )
