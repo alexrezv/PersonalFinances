@@ -16,22 +16,35 @@ object UserRepositoryImpl {
 final case class UserRepositoryImpl() extends UserRepository {
   import db.Ctx._
 
-  implicit val userInsertMeta: InsertMeta[User] = insertMeta[User](_.id)
-
   private val qs = quote {
     querySchema[User](
       entity = "usr",
       _.id       -> "id",
       _.uuid     -> "uuid",
-      _.userName -> "username"
+      _.userName -> "username",
+      _.password -> "password"
     )
   }
 
-  override def getUsers: QIO[List[User]] =
+  override def list: QIO[List[User]] =
     run(qs)
 
-  override def getUserByUUID(uuid: String): QIO[Option[User]] =
+  override def findByUUID(uuid: String): QIO[Option[User]] =
     run(
       qs.filter(_.uuid == lift(UUID.fromString(uuid)))
     ).map(_.headOption)
+
+  override def findByLogin(userName: String): QIO[Option[User]] =
+    run(
+      qs.filter(_.userName == lift(userName))
+    ).map(_.headOption)
+
+  override def insert(user: User): QIO[Unit] =
+    run(
+      qs.insert(
+        _.uuid     -> lift(user.uuid),
+        _.userName -> lift(user.userName),
+        _.password -> lift(user.password)
+      )
+    ).unit
 }

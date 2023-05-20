@@ -8,15 +8,25 @@ import java.sql.SQLException
 import javax.sql.DataSource
 
 trait UserRepository {
-  def getUsers: QIO[List[User]]
+  def list: QIO[List[User]]
 
-  def getUserByUUID(uuid: String): QIO[Option[User]]
+  def findByUUID(uuid: String): QIO[Option[User]]
+
+  def findByLogin(userName: String): QIO[Option[User]]
+
+  def insert(user: User): QIO[Unit]
 }
 
 object UserRepository {
-  def getUsers: ZIO[DataSource & UserRepository, SQLException, List[User]] =
-    ZIO.serviceWithZIO[UserRepository](_.getUsers)
+  def list: ZIO[DataSource & UserRepository, SQLException, List[User]] =
+    ZIO.serviceWithZIO[UserRepository](_.list)
 
-  def getUserByUUID(uuid: String): ZIO[DataSource & UserRepository, SQLException, Option[User]] =
-    ZIO.serviceWithZIO[UserRepository](_.getUserByUUID(uuid))
+  def findByUUID(uuid: String): ZIO[DataSource & UserRepository, SQLException, Option[User]] =
+    ZIO.serviceWithZIO[UserRepository](_.findByUUID(uuid))
+
+  def findByLogin(userName: String): ZIO[DataSource with UserRepository, SQLException, Option[User]] =
+    ZIO.serviceWithZIO[UserRepository](_.findByLogin(userName))
+
+  def insert(user: User): ZIO[DataSource & UserRepository, SQLException, Unit] =
+    ZIO.serviceWithZIO[UserRepository](_.insert(user))
 }
