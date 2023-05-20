@@ -12,7 +12,9 @@ object Dependencies {
 
   val LogbackVersion = "1.4.6"
 
-  val CirceVersion = "0.14.5"
+  val ZioJsonVersion = "0.5.0"
+
+  val ZioCryptoVersion = "0.0.0+238-70dbc3c7-SNAPSHOT"
 
   val `zio-http`      = "dev.zio" %% "zio-http" % ZHTTPVersion
   val `zio-http-test` = "dev.zio" %% "zio-http" % ZHTTPVersion % Test
@@ -29,12 +31,12 @@ object Dependencies {
 
   val logback = "ch.qos.logback" % "logback-classic" % LogbackVersion
 
-  val circe: Seq[ModuleID] = Seq(
-    "io.circe" %% "circe-core"    % CirceVersion,
-    "io.circe" %% "circe-parser"  % CirceVersion,
-    "io.circe" %% "circe-generic" % CirceVersion,
-    "io.circe" %% "circe-literal" % CirceVersion
+  val `zio-json`: Seq[ModuleID] = Seq(
+    "dev.zio" %% "zio-json"        % ZioJsonVersion,
+    "dev.zio" %% "zio-json-macros" % ZioJsonVersion
   )
+
+  val `zio-crypto` = "dev.zio" %% "zio-crypto" % ZioCryptoVersion
 
   val `zio-test`     = "dev.zio" %% "zio-test"     % ZioVersion % Test
   val `zio-test-sbt` = "dev.zio" %% "zio-test-sbt" % ZioVersion % Test

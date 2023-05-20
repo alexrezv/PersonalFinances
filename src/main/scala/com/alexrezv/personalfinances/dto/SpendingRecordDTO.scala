@@ -1,9 +1,9 @@
 package com.alexrezv.personalfinances.dto
 
 import com.alexrezv.personalfinances.dao.entities.SpendingRecord
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Decoder, Encoder}
+import zio.json._
 
+//@jsonDerive
 case class SpendingRecordDTO(
     id: Long,
     date: String,
@@ -13,8 +13,8 @@ case class SpendingRecordDTO(
   )
 
 object SpendingRecordDTO {
-  implicit val decoder: Decoder[SpendingRecordDTO] = deriveDecoder
-  implicit val encoder: Encoder[SpendingRecordDTO] = deriveEncoder
+  implicit val decoder: JsonDecoder[SpendingRecordDTO] = DeriveJsonDecoder.gen[SpendingRecordDTO]
+  implicit val encoder: JsonEncoder[SpendingRecordDTO] = DeriveJsonEncoder.gen[SpendingRecordDTO]
 
   def from(incomeRecord: SpendingRecord): SpendingRecordDTO = SpendingRecordDTO(
     incomeRecord.id,

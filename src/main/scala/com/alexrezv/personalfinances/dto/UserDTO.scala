@@ -1,17 +1,22 @@
 package com.alexrezv.personalfinances.dto
 
 import com.alexrezv.personalfinances.dao.entities.User
-import io.circe._
-import io.circe.generic.semiauto._
+import zio.json._
 
-case class UserDTO(uuid: String, userName: String)
+//@jsonDerive - won't work for some reason
+case class UserDTO(
+    uuid: Option[String],
+    userName: String,
+    password: Option[String]
+  )
 
 object UserDTO {
-  implicit val decoder: Decoder[UserDTO] = deriveDecoder
-  implicit val encoder: Encoder[UserDTO] = deriveEncoder
+  implicit val decoder: JsonDecoder[UserDTO] = DeriveJsonDecoder.gen[UserDTO]
+  implicit val encoder: JsonEncoder[UserDTO] = DeriveJsonEncoder.gen[UserDTO]
 
   def from(user: User): UserDTO = UserDTO(
-    user.uuid.toString,
-    user.userName
+    Some(user.uuid.toString),
+    user.userName,
+    None
   )
 }

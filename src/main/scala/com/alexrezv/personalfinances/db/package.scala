@@ -9,6 +9,6 @@ import javax.sql.DataSource
 package object db {
   object Ctx extends PostgresZioJdbcContext(NamingStrategy(SnakeCase))
 
-  val dsLayer: ZLayer[Any, Throwable, DataSource] =
+  val dsLayer: TaskLayer[DataSource] =
     Quill.DataSource.fromPrefix("db")
 }
