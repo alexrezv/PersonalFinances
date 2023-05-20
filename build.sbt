@@ -12,8 +12,13 @@ lazy val root = (project in file("."))
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     libraryDependencies ++= Seq(
       `zio-test`, `zio-test-sbt`, `zio-http`, `zio-http-test`,
-      quill, postgres, liquibase, logback
-    ) ++ `zio-config` ++ circe
+      quill, postgres, liquibase, logback,
+      `zio-crypto`
+    ) ++ `zio-config`++ `zio-json`,
+    scalacOptions ++= Seq(
+      "-Ymacro-annotations"
+    ),
+    resolvers += "Sonatype_Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
   )
   .settings(
     Docker / version          := version.value,
